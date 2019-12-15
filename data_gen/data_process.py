@@ -1,5 +1,6 @@
 import numpy as np
-import scipy
+from skimage.transform import rotate
+import cv2
 
 
 def get_transform(center, scale, res, rot=0):
@@ -52,9 +53,10 @@ def crop(img, center, scale, res, rot=0):
         new_size = int(np.math.floor(max(ht, wd) / sf))
         new_ht = int(np.math.floor(ht / sf))
         new_wd = int(np.math.floor(wd / sf))
-        img = scipy.misc.imresize(img, [new_ht, new_wd])
+        img = cv2.resize(img, (new_wd, new_ht), interpolation = cv2.INTER_AREA)#in opencv image shape is (width, height)
         center = center * 1.0 / sf
         scale = scale / sf
+        
 
     # Upper left point
     ul = np.array(transform([0, 0], center, scale, res, invert=1))
@@ -66,11 +68,12 @@ def crop(img, center, scale, res, rot=0):
     if not rot == 0:
         ul -= pad
         br += pad
+        
 
     new_shape = [br[1] - ul[1], br[0] - ul[0]]
     if len(img.shape) > 2:
         new_shape += [img.shape[2]]
-    new_img = np.zeros(new_shape)
+    new_img = np.zeros(new_shape).astype(np.uint8)
 
     # Range to fill new array
     new_x = max(0, -ul[0]), min(br[0], len(img[0])) - ul[0]
@@ -78,14 +81,16 @@ def crop(img, center, scale, res, rot=0):
     # Range to sample from original image
     old_x = max(0, ul[0]), min(len(img[0]), br[0])
     old_y = max(0, ul[1]), min(len(img), br[1])
-    new_img[new_y[0]:new_y[1], new_x[0]:new_x[1]] = img[old_y[0]:old_y[1], old_x[0]:old_x[1]]
 
+
+    new_img[new_y[0]:new_y[1], new_x[0]:new_x[1]] = img[old_y[0]:old_y[1], old_x[0]:old_x[1]]
+        
     if not rot == 0:
         # Remove padding
-        new_img = scipy.misc.imrotate(new_img, rot)
+        new_img = rotate(new_img, rot)
         new_img = new_img[pad:-pad, pad:-pad]
 
-    new_img = scipy.misc.imresize(new_img, res)
+    new_img = cv2.resize(new_img, (res[1], res[0]), interpolation = cv2.INTER_AREA)
     return new_img
 
 
@@ -153,3 +158,4 @@ def generate_gtmap(joints, sigma, outres):
         if visibility > 0:
             gtmap[:, :, i] = draw_labelmap(gtmap[:, :, i], joints[i, :], sigma)
     return gtmap
+

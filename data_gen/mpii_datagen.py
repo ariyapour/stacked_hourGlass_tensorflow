@@ -1,11 +1,11 @@
 import os
 import numpy as np
 from random import shuffle
-import scipy.misc
 import json
-import data_process
 import random
-
+import cv2
+import imageio
+from .data_process import *
 
 class MPIIDataGen(object):
 
@@ -85,7 +85,8 @@ class MPIIDataGen(object):
 
     def process_image(self, sample_index, kpanno, sigma, rot_flag, scale_flag, flip_flag):
         imagefile = kpanno['img_paths']
-        image = scipy.misc.imread(os.path.join(self.imgpath, imagefile))
+        # image = scipy.misc.imread(os.path.join(self.imgpath, imagefile))
+        image = imageio.imread(os.path.join(self.imgpath, imagefile))
 
         # get center
         center = np.array(kpanno['objpos'])
@@ -110,13 +111,12 @@ class MPIIDataGen(object):
             rot = np.random.randint(-1 * 30, 30)
         else:
             rot = 0
-
-        cropimg = data_process.crop(image, center, scale, self.inres, rot)
-        cropimg = data_process.normalize(cropimg, self.get_color_mean())
+        cropimg = crop(image, center, scale, self.inres, rot)
+        cropimg = normalize(cropimg, self.get_color_mean())
 
         # transform keypoints
-        transformedKps = data_process.transform_kp(joints, center, scale, self.outres, rot)
-        gtmap = data_process.generate_gtmap(transformedKps, sigma, self.outres)
+        transformedKps = transform_kp(joints, center, scale, self.outres, rot)
+        gtmap = generate_gtmap(transformedKps, sigma, self.outres)
 
         # meta info
         metainfo = {'sample_index': sample_index, 'center': center, 'scale': scale,
