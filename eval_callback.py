@@ -17,8 +17,8 @@ class EvalCallBack(keras.callbacks.Callback):
         return self.foldpath
 
     def run_eval(self, epoch):
-        valdata = MPIIDataGen("../../data/mpii/mpii_annotations.json",
-                              "../../data/mpii/images",
+        valdata = MPIIDataGen("data/mpii/mpii_annotations.json",
+                              "data/mpii/images",
                               inres=self.inres, outres=self.outres, is_train=False)
 
         total_suc, total_fail = 0, 0

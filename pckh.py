@@ -6,7 +6,7 @@ import os
 
 
 def run_pckh(model_name, predfile):
-    detection = loadmat('../../data/mpii/detections.mat')
+    detection = loadmat('data/mpii/detections.mat')
     det_idxs = detection['RELEASE_img_index']
     debug = 0
     threshold = 0.5
@@ -14,8 +14,8 @@ def run_pckh(model_name, predfile):
 
     pa = [2, 3, 7, 7, 4, 5, 8, 9, 10, 0, 12, 13, 8, 8, 14, 15]
 
-    dict = loadmat('../../data/mpii/detections_our_format.mat')
-    print dict.keys()
+    dict = loadmat('data/mpii/detections_our_format.mat')
+    print (dict.keys())
     dataset_joints = dict['dataset_joints']
     jnt_missing = dict['jnt_missing']
     pos_pred_src = dict['pos_pred_src']
@@ -25,15 +25,6 @@ def run_pckh(model_name, predfile):
     # predictions
     preds = loadmat(predfile)['preds']
     pos_pred_src = transpose(preds, [1, 2, 0])
-
-    if debug:
-        for i in range(len(det_idxs[0])):
-            anno = mat['RELEASE']['annolist'][0, 0][0][det_idxs[0][i] - 1]
-            fn = anno['image']['name'][0, 0][0]
-            imagePath = 'data/mpii/images/' + fn
-            oriImg = sio.imread(imagePath)
-            pred = pos_pred_src[:, :, i]
-            visualize(oriImg, pred, pa)
 
     head = np.where(dataset_joints == 'head')[1][0]
     lsho = np.where(dataset_joints == 'lsho')[1][0]

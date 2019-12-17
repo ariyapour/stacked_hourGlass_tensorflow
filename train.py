@@ -24,8 +24,6 @@ ap.add_argument("-nch", "--numChannels", type=int, default=256,
 	help="number of residual bottleNeck channels")
 ap.add_argument("-bs", "--batchSize", default=8, type=int,
     help='batch size for training')
-ap.add_argument("-mp", "--modelPath",
-    help='path to store trained model')
 ap.add_argument("-ep", "--epochs", default=20, type=int,
     help="number of traning epochs")
 ap.add_argument("-rs", "--resume", default=False, type=bool,
@@ -42,8 +40,6 @@ ap.add_argument("-s", "--startEpoch", type=int, default=0,
 args = vars(ap.parse_args())
 
 dataset_path = "data/mpii/"
-input_shape=[256,256]
-output_shape=[64,64]
 batch_size = args["batchSize"]
 epochs = args["epochs"]
 
@@ -68,7 +64,7 @@ if not args["resume"]:
                                  epochs=epochs, callbacks=callBacks)
     print("[INFO]Finished training...")
 else:
-    #load model
+    #Resume Training
     print("[INFO]Loading the model...")
     with open(args["resumeModelJson"]) as f:
         model = model_from_json(f.read())
