@@ -17,24 +17,22 @@ def bottleneck(input, channels, name):
     #bottleneck block
 
     #First conv 1x1
-    _next = BatchNormalization()(input)
-    _next = Conv2D(channels//2,(1,1), padding="same", activation='relu', name=name + "conv_1x1_1")(_next)
+    next = BatchNormalization()(input)
+    next = Conv2D(channels//2,(1,1), padding="same", activation='relu', name=name + "conv_1x1_1")(next)
 
     #Second conv 3x3
-    _next = BatchNormalization()(_next)
-    _next = Conv2D(channels//2,(3,3), padding="same", activation='relu', name=name + "conv_3x3")(_next)
+    next = BatchNormalization()(next)
+    next = Conv2D(channels//2,(3,3), padding="same", activation='relu', name=name + "conv_3x3")(next)
 
     #Third conv 1x1
-    _next = BatchNormalization()(_next)
-    _next = Conv2D(channels,(1,1), padding="same", activation='relu', name=name + "conv_1x1_2")(_next)
+    next = BatchNormalization()(next)
+    next = Conv2D(channels,(1,1), padding="same", activation='relu', name=name + "conv_1x1_2")(next)
 
-    _next = Add(name=name + "residual_output")([shortcut, _next])
+    next = Add(name=name + "residual_output")([shortcut, next])
 
-    return _next
+    return next
 
 def create_input_module(input, num_channels):
-    #first module
-    #first module reduces the input resolution to 1/4
     #conv2D with strite 2, filter size 7x7 and padding of same results 1/2 resolution
     #maxpooling results into another 1/2 of resolution
 
